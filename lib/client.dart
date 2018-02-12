@@ -1,7 +1,7 @@
 import 'dart:async';
-
+import 'dart:convert' as conv;
 import 'package:service_worker/window.dart' as sw;
-
+import 'package:js/js.dart' as js;
 /// PWA client that is running in the window scope.
 abstract class Client {
   /// Initializes a PWA client instance, also triggering the registration of
@@ -16,7 +16,7 @@ abstract class Client {
   /// If there is no current subscription, and the permission was not denied by
   /// the user, using the [subscribeIfNeeded] flag will request a new
   /// subscription, prompting the user if needed.
-  Future<PushPermission> getPushPermission({bool subscribeIfNeeded: false});
+  Future<PushPermission> getPushPermission({bool subscribeIfNeeded: false, String applicationServerKey: ''});
 }
 
 /// The granted permission of the Push notification API.
@@ -84,13 +84,16 @@ class _Client implements Client {
 
   @override
   Future<PushPermission> getPushPermission(
-      {bool subscribeIfNeeded: false}) async {
+      {bool subscribeIfNeeded: false, String applicationServerKey}) async {
     var reg = await _registration;
     PushPermissionStatus permStatus = PushPermissionStatus.denied;
     sw.PushSubscription subscription;
 
     var subscriptionOptions =
-        new sw.PushSubscriptionOptions(userVisibleOnly: true);
+        new sw.PushSubscriptionOptions(
+          userVisibleOnly: true,
+          applicationServerKey: (applicationServerKey==null?null:conv.BASE64.decode(applicationServerKey))
+        );
     String status = await reg.pushManager.permissionState(subscriptionOptions);
     if (status == 'prompt' || status == 'default') {
       permStatus = PushPermissionStatus.prompt;
