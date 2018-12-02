@@ -10,9 +10,9 @@ import 'package:yaml/yaml.dart' as yaml;
 
 Future main(List<String> args) async {
   ArgResults argv = (new ArgParser()
-        ..addOption('offline', allowMultiple: true, defaultsTo: 'build/web')
+        ..addMultiOption('offline', defaultsTo: ['build/web'])
         ..addOption('index-html', defaultsTo: 'index.html')
-        ..addOption('exclude', allowMultiple: true)
+        ..addMultiOption('exclude')
         ..addOption('exclude-defaults', defaultsTo: 'true')
         ..addOption('lib-dir', defaultsTo: 'lib')
         ..addOption('pwa-lib-dir', defaultsTo: 'lib/pwa')
@@ -21,8 +21,8 @@ Future main(List<String> args) async {
       .parse(args);
 
   List<String> sources = [
-    argv['lib-dir'],
-    argv['web-dir'],
+    argv['lib-dir'] as String,
+    argv['web-dir'] as String,
     'pubspec.yaml',
   ];
   List<String> offlineDirs = argv['offline'];
@@ -36,7 +36,7 @@ Future main(List<String> args) async {
     exit(-1);
   }
 
-  await _generateManifestJson(argv['web-dir'], pubspec);
+  await _generateManifestJson(argv['web-dir'] as String, pubspec);
   try {
     await _buildProjectIfEmptyOrOld(sources, [offlineUrlsFile], offlineDirs);
   } catch (e) {
@@ -167,9 +167,9 @@ class _OfflineUrlScanner {
   DateTime lastModified;
 
   _OfflineUrlScanner.fromArgv(ArgResults argv) {
-    _offlineDirs = argv['offline'];
-    _indexHtml = argv['index-html'];
-    _excludes = argv['exclude'];
+    _offlineDirs = argv['offline'] as List<String>;
+    _indexHtml = argv['index-html'] as String;
+    _excludes = argv['exclude'] as List<String>;
     _excludeDefaults = argv['exclude-defaults'] == 'true';
   }
 
@@ -250,7 +250,7 @@ class _OfflineUrlScanner {
 Future<String> _detectLibInclude(ArgResults argv, Map pubspec) async {
   String libInclude = argv['lib-include'];
   if (libInclude != null) return libInclude;
-  if (pubspec != null) return pubspec['name'];
+  if (pubspec != null) return pubspec['name'] as String;
   return null;
 }
 

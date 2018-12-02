@@ -1,4 +1,18 @@
-# Changelog
+## 0.1.12
+
+- Updated dependency.
+
+## 0.1.11
+
+- Support Dart 2 stable.
+
+## 0.1.10
+
+- Support the latest version of `package:service_worker`.
+
+## 0.1.9+1
+
+- Support `args: ">=0.13.7 <2.0.0"`.
 
 ## 0.1.9
 
