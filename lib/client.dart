@@ -92,7 +92,8 @@ class _Client implements Client {
     var subscriptionOptions =
         new sw.PushSubscriptionOptions(
           userVisibleOnly: true,
-          applicationServerKey: (applicationServerKey==null?null:conv.BASE64.decode(applicationServerKey))
+          applicationServerKey: (applicationServerKey==null?null:conv.base64.decode(
+            conv.base64Url.normalize(applicationServerKey)))
         );
     String status = await reg.pushManager.permissionState(subscriptionOptions);
     if (status == 'prompt' || status == 'default') {
