@@ -10,7 +10,8 @@ import 'package:yaml/yaml.dart' as yaml;
 
 Future main(List<String> args) async {
   ArgResults argv = (new ArgParser()
-        ..addMultiOption('offline', defaultsTo: ['build/web'])
+//        ..addMultiOption('offline', defaultsTo: ['build/web'])
+        ..addMultiOption('offline', defaultsTo: ['build'])
         ..addOption('index-html', defaultsTo: 'index.html')
         ..addMultiOption('exclude')
         ..addOption('exclude-defaults', defaultsTo: 'true')
@@ -115,18 +116,20 @@ Future _buildProjectIfEmptyOrOld(List<String> sources, List<String> excludes,
       if (lastSourceTimestamp < lastOfflineTimestamp) return;
     }
     print('Running pub build:');
-    String executable = 'pub';
-    if (Platform.isWindows) {
-      try {
-        final pr = await Process.run('pub.exe', ['--version']);
-        if (pr.exitCode == 0) {
-          executable = 'pub.exe';
-        }
-      } catch (_) {}
-    }
-    print('$executable build');
+ //   String executable = 'pub';
+ //   if (Platform.isWindows) {
+ //     try {
+ //       final pr = await Process.run('pub.exe', ['--version']);
+ //       if (pr.exitCode == 0) {
+ //         executable = 'pub.exe';
+ //       }
+ //     } catch (_) {}
+ //   }
+ //    print('$executable build');
     print('-----');
-    Process process = await Process.start(executable, ['build']);
+ //   Process process = await Process.start(executable, ['build']);
+    Process process = await Process.start('webdev', ['build']);
+ 
     Future f1 = stdout.addStream(process.stdout);
     Future f2 = stderr.addStream(process.stderr);
     await Future.wait([f1, f2]);
@@ -232,7 +235,11 @@ class _OfflineUrlScanner {
 
   /// Updates the offline_urls.g.dart file.
   Future writeToFile(String fileName) async {
-    String listItems = offlineUrls.map((s) => '\'$s\',').join();
+    String listItems = offlineUrls
+        .where((s) => !s.startsWith('./.'))
+        .map((s) => '\'$s\',')
+        .map((s) => s.replaceAll('\$sdk', '\\\$sdk'))
+        .join();
     String lastModifiedText = lastModified.toUtc().toIso8601String();
     String src = '''
     /// URLs for offline cache.
