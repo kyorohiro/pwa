@@ -36,11 +36,19 @@ class Notification {
 // methods for actions and reacting to them (e.g. click on notification).
 // ignore: one_member_abstracts
 abstract class PushContext {
+  PushMessageData get messageData;
   /// Displays a notification.
   Future showNotification(Notification notification);
 }
 
 class _PushContext extends PushContext {
+  _PushContext(this._messageData);
+
+  final PushMessageData  _messageData;
+
+  @override
+  PushMessageData get messageData => _messageData;
+
   @override
   Future showNotification(Notification notification) async {
     ShowNotificationOptions options = new ShowNotificationOptions();

@@ -127,7 +127,7 @@ void _run(Worker worker) {
 
   if (worker.pushHandler != null) {
     onPush.listen((PushEvent event) {
-      Future f = worker.pushHandler(new _PushContext());
+      Future f = worker.pushHandler(new _PushContext(event.data));
       if (f != null) {
         event.waitUntil(f.then((_) => null, onError: (_) => null));
       }
